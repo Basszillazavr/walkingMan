@@ -1,0 +1,96 @@
+<script src="https://code.jquery.com/jquery-2.2.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.1/TweenMax.min.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<div class="footer-walk">
+    <div class="footer-wrapper">
+        <div class="footer-walk-man">
+          <img src="character-render.gif" alt="">
+      </div>
+        <div class="footer-walk-info">
+            <div class="footer-walk-info-in">
+                <div class="footer-walk-title">Пока вы находитесь на сайте,</div>
+                <div>человечек уже прошел <b class="footer-walk-metr">0</b> м</div>
+                <div>и, между прочим, потратил <b class="footer-walk-cal">0</b> ккал</div>
+            </div>
+        </div>
+    </div>
+</div>
+  <script type="text/javascript">
+      
+var curr;
+var swapped = 0;
+var $W = $(window);
+var $man = $('.footer-walk-man');
+var mw = $man.width();
+var max = $W.width() - mw;
+var time = $W.width()/(mw*1.2);
+
+var walk = {
+    init: function (){
+        walk.right();
+        walk.counters();
+        $W.on('resize', function (){
+            max = walk.getMax();
+            time = $W.width()/mw;
+        });
+    },
+    getMax: function (){
+        return $W.width() - mw;
+    },
+    swap: function(){
+        swapped = swapped ? false : true;
+        curr = curr == '180deg' ? '0deg' : '180deg';
+        TweenMax.set($man, {transform: 'rotateY('+ curr +')'});
+    },
+    left: function (){
+        curr = swapped ? '0deg' : '180deg';
+        TweenMax.set($man, {transform: 'rotateY('+ curr +')'});
+        TweenMax.to(
+            $man,
+            time,
+            {
+                left: 0,
+                ease: Power0.easeNone,
+                onComplete: function(){
+                    TweenLite.killTweensOf($man);
+                    walk.right();
+                }
+            }
+        );
+    },
+    right: function (){
+        curr = swapped ? '180deg' : '0deg';
+        TweenMax.set($man, {transform: 'rotateY('+ curr +')'});
+        TweenMax.to(
+            $man,
+            time,
+            {
+                left: max,
+                ease: Power0.easeNone,
+                onComplete: function(){
+                    TweenLite.killTweensOf($man);
+                    walk.left();
+                }
+            }
+        );
+    },
+    counters: function (){
+        var $metr, $cal,
+            _timer;
+      
+        $metr = $('.footer-walk-metr');
+        $cal = $('.footer-walk-cal');
+      
+      console.log($metr.text());
+
+        clearInterval(_timer);
+        _timer = setInterval(function (){
+            $metr.text(parseInt($metr.text())+1);
+            $cal.text(Number(parseFloat($cal.text())+0.087).toFixed(2));
+        }, 1000);
+    }
+};
+  
+walk.init();
+
+  </script>
